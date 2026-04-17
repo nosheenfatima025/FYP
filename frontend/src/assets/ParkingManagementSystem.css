@@ -1,0 +1,76 @@
+.pms-container {
+    min-height: 100vh;
+    min-width: 100vh;
+    padding: 2rem;
+    background-color: #f3f4f6;
+    font-family: Arial, sans-serif;
+}
+
+.pms-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.pms-section {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.pms-section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.pms-form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.pms-form input {
+    border: 1px solid #d1d5db;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.pms-form button {
+    margin-top: 1rem;
+    background-color: #2563eb;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    border: none;
+}
+
+.pms-form button:hover {
+    background-color: #1e40af;
+}
+
+.pms-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pms-table th,
+.pms-table td {
+    border: 1px solid #d1d5db;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.pms-table thead {
+    background-color: #e5e7eb;
+}
+
+.pms-admin-list {
+    list-style-type: disc;
+    margin-left: 1.5rem;
+    color: #374151;
+}

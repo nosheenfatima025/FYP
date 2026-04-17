@@ -1,0 +1,203 @@
+// const bcrypt = require("bcryptjs");
+// const jwt = require("jsonwebtoken");
+// const User = require("../models/User");
+// const Admin = require("../models/Admin");
+// const Wallet = require("../models/Wallet");
+// const { generateUserQrCode } = require("../utils/qrCode");
+
+
+// const generateToken = (id, role) => {
+//     return jwt.sign(
+//         { id, role },
+//         process.env.JWT_SECRET,
+//         {
+//             expiresIn: "7d"
+
+//         })
+// };
+
+// //user register
+
+// exports.userRegister = async (req, res) => {
+//     const { name, phone, email, password, plateNumber } = req.body;
+
+//     if (!name || !phone || !password) {
+//         return res.status(400).json({ message: "All required fields missing" });
+//     }
+
+//     if (!plateNumber) {
+//         return res.status(400).json({ message: "Vehicle Plate Number is required!" });
+//     }
+
+//     const exists = await User.findOne({ phone });
+//     if (exists) {
+//         return res.status(400).json({ message: "User already exits!" })
+//     }
+
+//     const passwordHash = await bcrypt.hash(password, 10);
+
+//     const user = await User.create({
+//         name,
+//         phone,
+//         email,
+//         passwordHash
+//     });
+
+//     await Wallet.create({ userId: user._id });
+
+//     const qrCode = await generateUserQrCode(user._id, plateNumber);
+
+//     res.status(201).json({
+//         message: "User registered successfully",
+//         user: {
+//             _id: user._id,
+//             name: user.name,
+//             phone: user.phone,
+//             email: user.email,
+//             role: user.role,
+//             qrCode: qrCode
+//         },
+//         token: generateToken(user._id, user.role)
+//     });
+// }
+
+// //login user
+
+// exports.userLogin = async (req, res) => {
+//     const { phone, password } = req.body;
+
+//     const user = await User.findOne({ phone });
+//     if (!user) {
+//         return res.status(400).json({ message: "User not found!" });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.passwordHash);
+//     if (!isMatch) {
+//         return res.status(400).json({ message: "Invalid credentials!" })
+//     }
+
+//     const token = generateToken(user._id, user.role);
+
+//     res.status(200).json({
+//         message: "User logged in successfully",
+//         user: {
+//             _id: user._id,
+//             name: user.name,
+//             phone: user.phone,
+//             email: user.email,
+//             role: user.role
+//         },
+//         token
+//     });
+// }
+
+// //admin login
+
+// exports.adminLogin = async (req, res) => {
+//     const { email, password } = req.body;
+
+//     const admin = await Admin.findOne({ email });
+//     if (!admin) {
+//         return res.status(400).json({ message: "Admin not found!" });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, admin.passwordHash);
+//     if (!isMatch) {
+//         return res.status(400).json({ message: "Invalid credentials!" })
+//     }
+
+//     const token = generateToken(admin._id, admin.role);
+
+//     res.status(200).json({
+//         message: "Admin logged in successfully",
+//         admin: {
+//             _id: admin._id,
+//             email: admin.email,
+//             role: admin.role
+//         },
+//         token
+//     });
+// }
+
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const Admin = require("../models/Admin");
+const Wallet = require("../models/Wallet");
+const Vehicle = require("../models/Vehicle");
+const QRCode = require("qrcode");
+
+const generateToken = (id, role) =>
+    jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
+
+// User Register
+exports.userRegister = async (req, res) => {
+    try {
+        const { name, phone, email, password, plateNumber } = req.body;
+        if (!name || !phone || !email || !password || !plateNumber)
+            return res.status(400).json({ message: "All fields required" });
+
+        const exists = await User.findOne({ $or: [{ phone }, { email }] });
+        if (exists) return res.status(400).json({ message: "User already exists" });
+
+        const passwordHash = await bcrypt.hash(password, 10);
+        const user = await User.create({ name, phone, email, passwordHash });
+
+        await Wallet.create({ userId: user._id });
+
+        // Generate QR
+        const qrData = JSON.stringify({ userId: user._id, plateNumber });
+        const qrCode = await QRCode.toDataURL(qrData);
+
+        // Save vehicle
+        await Vehicle.create({ userId: user._id, plateNumber, qrCode });
+
+        res.status(201).json({
+            message: "User registered successfully",
+            user: { _id: user._id, name: user.name, phone: user.phone, email: user.email },
+            token: generateToken(user._id, user.role),
+            qrCode
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+exports.userLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ message: "User not found" });
+
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+        res.json({
+            message: "Login successful",
+            user: { _id: user._id, name: user.name, phone: user.phone, email: user.email },
+            token: generateToken(user._id, user.role)
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Admin Login
+exports.adminLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const admin = await Admin.findOne({ email });
+        if (!admin) return res.status(400).json({ message: "Admin not found" });
+
+        const isMatch = await bcrypt.compare(password, admin.passwordHash);
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+        res.json({
+            message: "Admin login successful",
+            admin: { _id: admin._id, email: admin.email, role: admin.role },
+            token: generateToken(admin._id, admin.role)
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
