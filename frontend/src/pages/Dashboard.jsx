@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const TOTAL_SLOTS = 50;
-const API = "http://localhost:3000/api";
+const API = "https://fyp-dun-two.vercel.app/api";
 
 export default function Dashboard() {
     const navigate = useNavigate();
