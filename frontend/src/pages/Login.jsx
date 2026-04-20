@@ -35,9 +35,10 @@ export default function Login() {
                 setTimeout(() => navigate("/dashboard"), 900);
                 return;
             }
+            
             // Try user
-            const uRes = await fetch(`${API}/auth/login`, {
-                method: "POST", headers: { "Content-Type": "application/json" },
+                    const uRes = await fetch(`${API}/auth/admin/login`, {
+                    method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: email.trim(), password }),
             });
             const uData = await uRes.json();
