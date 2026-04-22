@@ -1,13 +1,3 @@
-// const mongoose = require("mongoose");
-
-// const fraudLogSchema = new mongoose.Schema({
-//     numberPlate:{type:String,required:true},
-//     qrCode:{type:String,default:null},
-//     reason:{type:String,required:true},
-//     detectedAt:{type:Date,default:Date.now}
-// })
-
-// module.exports = mongoose.model("FraudLog", fraudLogSchema);
 
 const mongoose = require("mongoose");
 

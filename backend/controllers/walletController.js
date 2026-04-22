@@ -1,28 +1,3 @@
-// const Wallet = require('../models/Wallet');
-
-// exports.getWallet = async (req, res) => {
-//     const wallet = await Wallet.findOne({ userId: req.user._id });
-//     if (!wallet) {
-//         return res.status(404).json({ message: "Wallet not found!" });
-//     }
-//     res.status(200).json({ balance: wallet.balance });
-
-// }
-
-// exports.rechargeWallet = async (req, res) => {
-//         const { amount } = req.body;
-
-//         if(amount <= 0){
-//             return res.status(400).json({ message: "Invalid recharge amount!" });
-//         }
-
-//         const wallet = await Wallet.findOne({ userId: req.user._id });
-
-//         wallet.balance += amount;
-//         await wallet.save();
-
-//         res.status(200).json({ message: "Wallet recharged successfully", balance: wallet.balance });
-// }
 
 const Wallet = require("../models/Wallet");
 const Vehicle = require("../models/Vehicle");

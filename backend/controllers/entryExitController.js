@@ -10,7 +10,7 @@ const fetch = require("node-fetch");
 const RATE_PER_HOUR = 50;
 const FLASK_URL = "https://unmisanthropically-supranaturalistic-lorretta.ngrok-free.dev";
 
-// ── Detect plate via Flask ANPR ──────────────────────────────────────────────
+// Detect plate via Flask ANPR 
 const detectPlate = async (imageBuffer, mimetype = "image/jpeg") => {
     try {
         const form = new FormData();
@@ -31,7 +31,7 @@ const detectPlate = async (imageBuffer, mimetype = "image/jpeg") => {
     }
 };
 
-// ── Vehicle Entry ─────────────────────────────────────────────────────────────
+// Vehicle Entry
 exports.vehicleEntry = async (req, res) => {
     try {
         let plateNumber = req.body.plateNumber;
@@ -81,7 +81,7 @@ exports.vehicleEntry = async (req, res) => {
     }
 };
 
-// ── Vehicle Exit ──────────────────────────────────────────────────────────────
+// Vehicle Exit
 exports.vehicleExit = async (req, res) => {
     try {
         let plateNumber = req.body.plateNumber;
@@ -146,7 +146,7 @@ exports.vehicleExit = async (req, res) => {
     }
 };
 
-// ── Detect plate only (test endpoint) ────────────────────────────────────────
+// Detect plate only (test endpoint)
 exports.detectPlateOnly = async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: "Image required" });
@@ -157,7 +157,7 @@ exports.detectPlateOnly = async (req, res) => {
     }
 };
 
-// ── All Logs ──────────────────────────────────────────────────────────────────
+//  All Logs
 exports.getAllLogs = async (req, res) => {
     try {
         const logs = await EntryExitLog.find()

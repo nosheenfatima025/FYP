@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-// Simple in-memory store (ya MongoDB model bana sakte ho)
 let rates = [
     { type: "car", label: "Car", icon: "🚗", hourly: 50, minCharge: 10, dailyMax: 400, monthly: 2400, grace: 15, enabled: true, colorClass: "car" },
     { type: "motorcycle", label: "Motorcycle", icon: "🏍️", hourly: 25, minCharge: 5, dailyMax: 200, monthly: 1200, grace: 10, enabled: true, colorClass: "motorcycle" },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const API = "https://fyp-dun-two.vercel.app/api";
@@ -35,7 +35,7 @@ export default function Login() {
                 setTimeout(() => navigate("/dashboard"), 900);
                 return;
             }
-            
+
             // Try user
                     const uRes = await fetch(`${API}/auth/admin/login`, {
                     method: "POST", headers: { "Content-Type": "application/json" },

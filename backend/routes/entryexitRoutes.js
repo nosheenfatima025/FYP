@@ -3,10 +3,10 @@ const router = express.Router();
 const multer = require("multer");
 const { vehicleEntry, vehicleExit, getAllLogs, detectPlateOnly } = require("../controllers/entryExitController");
 
-// Multer - memory storage (no file saved to disk)
+// Multer - memory storage
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB max
+    limits: { fileSize: 10 * 1024 * 1024 }
 });
 
 router.post("/entry", upload.single("image"), vehicleEntry);
