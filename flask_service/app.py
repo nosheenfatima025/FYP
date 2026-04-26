@@ -8,8 +8,7 @@ import os
 import re
 
 app = Flask(__name__)
-CORS(app)
-
+CORS(app, origins="*")
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "best.pt")
 print("Loading YOLO model...")
 model = YOLO(MODEL_PATH)
