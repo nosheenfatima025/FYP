@@ -1,20 +1,13 @@
+
 const Wallet = require("../models/Wallet");
 const Vehicle = require("../models/Vehicle");
+const User = require("../models/User");
 
 exports.getWallet = async (req, res) => {
     try {
-        let wallet = await Wallet.findOne({ userId: req.user._id });
-
-        // 🔥 auto create wallet
-        if (!wallet) {
-            wallet = await Wallet.create({
-                userId: req.user._id,
-                balance: 0
-            });
-        }
-
+        const wallet = await Wallet.findOne({ userId: req.user._id });
+        if (!wallet) return res.status(404).json({ message: "Wallet not found" });
         res.json({ balance: wallet.balance });
-
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -22,30 +15,17 @@ exports.getWallet = async (req, res) => {
 
 exports.rechargeWallet = async (req, res) => {
     try {
-        let { amount } = req.body;
-
-        amount = Number(amount);
-
-        if (!amount || amount <= 0) {
-            return res.status(400).json({ message: "Invalid amount" });
-        }
+        const { amount } = req.body;
+        if (!amount || amount <= 0) return res.status(400).json({ message: "Invalid amount" });
 
         const wallet = await Wallet.findOne({ userId: req.user._id });
+        if (!wallet) return res.status(404).json({ message: "Wallet not found" });
 
-        if (!wallet) {
-            return res.status(404).json({ message: "Wallet not found" });
-        }
-
-        wallet.balance += amount;
+        wallet.balance += Number(amount);
         wallet.lastUpdated = new Date();
-
         await wallet.save();
 
-        res.json({
-            message: "Wallet recharged",
-            balance: wallet.balance
-        });
-
+        res.json({ message: "Wallet recharged", balance: wallet.balance });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -53,12 +33,8 @@ exports.rechargeWallet = async (req, res) => {
 
 exports.getAllWallets = async (req, res) => {
     try {
-        const wallets = await Wallet.find()
-            .populate("userId", "name phone email")
-            .sort({ updatedAt: -1 });
-
+        const wallets = await Wallet.find().populate("userId", "name phone email");
         res.json(wallets);
-
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -66,46 +42,21 @@ exports.getAllWallets = async (req, res) => {
 
 exports.adminTopUp = async (req, res) => {
     try {
-        let { plateNumber, amount } = req.body;
+        const { plateNumber, amount } = req.body;
+        if (!plateNumber || !amount || amount <= 0)
+            return res.status(400).json({ message: "plateNumber and amount required" });
 
-        amount = Number(amount);
-
-        if (!plateNumber || !amount || amount <= 0) {
-            return res.status(400).json({
-                message: "plateNumber and valid amount required"
-            });
-        }
-
-        // 🔒 Only active vehicle allowed
-        const vehicle = await Vehicle.findOne({
-            plateNumber,
-            isActive: true
-        });
-
-        if (!vehicle) {
-            return res.status(404).json({
-                message: "Active vehicle not found"
-            });
-        }
+        const vehicle = await Vehicle.findOne({ plateNumber });
+        if (!vehicle) return res.status(404).json({ message: "Vehicle not found" });
 
         const wallet = await Wallet.findOne({ userId: vehicle.userId });
+        if (!wallet) return res.status(404).json({ message: "Wallet not found" });
 
-        if (!wallet) {
-            return res.status(404).json({
-                message: "Wallet not found"
-            });
-        }
-
-        wallet.balance += amount;
+        wallet.balance += Number(amount);
         wallet.lastUpdated = new Date();
-
         await wallet.save();
 
-        res.json({
-            message: `Rs.${amount} added to ${plateNumber}`,
-            balance: wallet.balance
-        });
-
+        res.json({ message: `Rs.${amount} added to ${plateNumber}`, balance: wallet.balance });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
